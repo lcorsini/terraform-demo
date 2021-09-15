@@ -15,7 +15,7 @@ steps:
   args: 
   - '-c'
   - |
-      terraform init
+      terraform init -no-color
        
 # [START tf-plan]
 - id: 'tf plan'
@@ -24,7 +24,7 @@ steps:
   args: 
   - '-c'
   - | 
-      terraform plan 
+      terraform plan -no-color
 # [END tf-plan]
 
 # [START tf-apply]
@@ -34,7 +34,7 @@ steps:
   args: 
   - '-c'
   - | 
-      terraform apply -auto-approve
+      terraform apply -no-color -auto-approve
 # [END tf-apply]   
 options:
  logging: CLOUD_LOGGING_ONLY
