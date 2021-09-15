@@ -6,10 +6,10 @@ terraform {
 }
 
 provider "google" {
-  project     = "di-devops-lab"
-  region      = "europe-west3"
-  zone        = "europe-west3-b"
-  credentials = file("/Users/corsinilu/Develop/NTTDATA/dev-workspace/terraform-demo/credentials.json")
+  #project     = "di-devops-lab"
+  #region      = "europe-west3"
+  #zone        = "europe-west3-b"
+  #credentials = file("/Users/corsinilu/Develop/NTTDATA/dev-workspace/terraform-demo/credentials.json")
 }
 
 module "vpc" {
