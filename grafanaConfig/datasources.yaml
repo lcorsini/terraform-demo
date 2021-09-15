@@ -1,0 +1,13 @@
+datasources: 
+  datasources.yaml:
+   #deleteDatasources: []
+     #- name: "Datasource To Delete"
+   orgId: 1
+   apiVersion: 1
+   datasources:
+   # Prometheus
+   - name: prometheus
+     type: prometheus
+     url: http://prometheus-server.monitoring.svc.cluster.local:9090
+     access: proxy
+     isDefault: false
