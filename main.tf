@@ -174,6 +174,10 @@ module "helm_grafana" {
     {
       name  = "ingress.enabled"
       value = 1
+    },
+    {
+      name = "service.type"
+      value = "LoadBalancer"
     }
   ]
 }
