@@ -180,6 +180,10 @@ module "helm_grafana" {
     {
       name  = "ingress.enabled"
       value = 1
+    },
+    {
+      name = "service.type"
+      value = "LoadBalancer"
     }
   ]
 }
@@ -190,12 +194,22 @@ data "kubernetes_secret" "grafana_admin_password" {
       namespace = "monitoring"
     }
 }
-#output "admin_password" {
-#    value = nonsensitive(data.kubernetes_secret.grafana_admin_password.data.admin-password)
-#}
+data "kubernetes_service" "grafana_service" {
+  metadata {
+    name = "grafana"
+    namespace = "monitoring"
+  }
+}
+output "ip_address" {
+    value = data.kubernetes_service.grafana_service.status.0.load_balancer.0.ingress.0.ip
+  
+}
+output "admin_password" {
+    value = nonsensitive(data.kubernetes_secret.grafana_admin_password.data.admin-password)
+}
 
 provider "grafana" {
-  url  = "http://grafana.monitoring.svc.cluster.local"
+  url  = "http://${data.kubernetes_service.grafana_service.status.0.load_balancer.0.ingress.0.ip}"
   auth = "admin:${data.kubernetes_secret.grafana_admin_password.data.admin-password}"
 }
 resource "grafana_dashboard" "metrics" {
