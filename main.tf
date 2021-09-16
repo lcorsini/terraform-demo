@@ -1,3 +1,6 @@
+locals {
+  project = "di-devops-lab"
+}
 terraform {
   backend "gcs" {
     bucket = "di-devops-terragrunt"
@@ -12,17 +15,13 @@ terraform {
 }
 
 provider "google" {
-  #project     = "di-devops-lab"
-  #region      = "europe-west3"
-  #zone        = "europe-west3-b"
-  #credentials = file("/Users/corsinilu/Develop/NTTDATA/dev-workspace/terraform-demo/credentials.json")
 }
 
 module "vpc" {
   source  = "terraform-google-modules/network/google"
   version = "3.4.0"
 
-  project_id   = "di-devops-lab"
+  project_id   = local.project
   network_name = "devops-vpc"
 
   subnets = [
@@ -67,7 +66,7 @@ provider "helm" {
 module "gke" {
   depends_on = [module.vpc]
   source     = "terraform-google-modules/kubernetes-engine/google"
-  project_id = "di-devops-lab"
+  project_id = local.project
   name       = "gke-cluster"
   region     = "europe-west3"
   #zones                      = ["us-central1-a", "us-central1-b", "us-central1-f"]
@@ -189,12 +188,14 @@ module "helm_grafana" {
 }
 
 data "kubernetes_secret" "grafana_admin_password" {
+    depends_on = [module.helm_grafana]
     metadata {
       name = "grafana"
       namespace = "monitoring"
     }
 }
 data "kubernetes_service" "grafana_service" {
+   depends_on = [module.helm_grafana]
   metadata {
     name = "grafana"
     namespace = "monitoring"
