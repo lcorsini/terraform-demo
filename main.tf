@@ -3,6 +3,12 @@ terraform {
     bucket = "di-devops-terragrunt"
     prefix = "tfdemo/gke/terraform.tfstate"
   }
+  required_providers {
+    grafana = {
+      source  = "grafana/grafana"
+      version = "1.13.4"
+    }
+  }
 }
 
 provider "google" {
@@ -176,4 +182,23 @@ module "helm_grafana" {
       value = 1
     }
   ]
+}
+
+data "kubernetes_secret" "grafana_admin_password" {
+    metadata {
+      name = "grafana"
+      namespace = "monitoring"
+    }
+}
+#output "admin_password" {
+#    value = nonsensitive(data.kubernetes_secret.grafana_admin_password.data.admin-password)
+#}
+
+provider "grafana" {
+  url  = "http://grafana.monitoring.svc.cluster.local"
+  auth = "admin:${data.kubernetes_secret.grafana_admin_password.data.admin-password}"
+}
+resource "grafana_dashboard" "metrics" {
+  provider = grafana
+  config_json = file("./grafanaConfig/kubernetes_cluster_monitoring.json")
 }
