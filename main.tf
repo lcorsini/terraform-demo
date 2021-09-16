@@ -214,5 +214,5 @@ provider "grafana" {
 }
 resource "grafana_dashboard" "metrics" {
   provider = grafana
-  config_json = file("./grafanaConfig/kubernetes_cluster_monitoring.json")
+  config_json = file("./kubernetes_cluster_monitoring.json")
 }
