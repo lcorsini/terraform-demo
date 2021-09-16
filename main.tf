@@ -168,7 +168,7 @@ module "helm_grafana" {
   }
 
   values = [
-    file("${path.module}/grafanaConfig/datasources.yaml")
+    file("${path.module}/datasources.yaml")
   ]
   set = [
     {
