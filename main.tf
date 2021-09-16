@@ -3,6 +3,12 @@ terraform {
     bucket = "di-devops-terragrunt"
     prefix = "tfdemo/gke/terraform.tfstate"
   }
+  required_providers {
+    grafana = {
+      source  = "grafana/grafana"
+      version = "1.13.4"
+    }
+  }
 }
 
 provider "google" {
@@ -180,4 +186,33 @@ module "helm_grafana" {
       value = "LoadBalancer"
     }
   ]
+}
+
+data "kubernetes_secret" "grafana_admin_password" {
+    metadata {
+      name = "grafana"
+      namespace = "monitoring"
+    }
+}
+data "kubernetes_service" "grafana_service" {
+  metadata {
+    name = "grafana"
+    namespace = "monitoring"
+  }
+}
+output "ip_address" {
+    value = data.kubernetes_service.grafana_service.status.0.load_balancer.0.ingress.0.ip
+  
+}
+output "admin_password" {
+    value = nonsensitive(data.kubernetes_secret.grafana_admin_password.data.admin-password)
+}
+
+provider "grafana" {
+  url  = "http://${data.kubernetes_service.grafana_service.status.0.load_balancer.0.ingress.0.ip}"
+  auth = "admin:${data.kubernetes_secret.grafana_admin_password.data.admin-password}"
+}
+resource "grafana_dashboard" "metrics" {
+  provider = grafana
+  config_json = file("./kubernetes_cluster_monitoring.json")
 }
